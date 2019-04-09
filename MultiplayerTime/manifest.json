@@ -1,0 +1,10 @@
+{
+  "Name": "MultiplayerTime",
+  "Author": "DoubleZ",
+  "Version": "1.0.0",
+  "Description": "Stop time if each player on server should have time stopped.",
+  "UniqueID": "DoubleZ.MultiplayerTime",
+  "EntryDll": "MultiplayerTime.dll",
+  "MinimumApiVersion": "2.10.0",
+  "UpdateKeys": []
+}
