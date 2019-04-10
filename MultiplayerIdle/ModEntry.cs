@@ -6,7 +6,7 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 
-namespace MultiplayerTime {
+namespace MultiplayerIdle {
     /// <summary>The mod entry point.</summary>
     public class ModEntry : Mod {
         /*********
@@ -24,11 +24,15 @@ namespace MultiplayerTime {
             helper.Events.Multiplayer.PeerDisconnected += this.OnPeerDisconnected;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
         }
-    
+
         private void OnButtonPressed(object sender, ButtonPressedEventArgs e) {
             // ignore if player hasn't loaded a save yet
             if (!Context.IsWorldReady)
                 return;
+            if (e.Button == SButton.P) {
+                switchIdleMode();
+                showMessage($"Idle Swiths to {this.Config.IdleMethod} Mode");
+            }
             if (isIdle) {
                 isIdle = false;
                 if (Context.IsMainPlayer) {
@@ -82,7 +86,7 @@ namespace MultiplayerTime {
                 if (Context.IsMainPlayer) {
                     Game1.gameTimeInterval = 0;
                 }
-            } 
+            }
         }
 
         private void OnPeerDisconnected(object sender, PeerDisconnectedEventArgs e) {
@@ -106,7 +110,7 @@ namespace MultiplayerTime {
                         showIdle = false;
                         NotifyFarmersIdle(showIdle);
                     }
-                }else if (!CheckIdle() && message.Idle) {
+                } else if (!CheckIdle() && message.Idle) {
                     _peers[e.FromPlayerID] = message.Idle;
                     if (CheckIdle()) {
                         showIdle = true;
@@ -143,6 +147,25 @@ namespace MultiplayerTime {
         private void NotifyFarmersIdle(bool idle) {
             ShowIdleMessage message = new ShowIdleMessage(idle);
             this.Helper.Multiplayer.SendMessage(message, "ShowIdleMessage", modIDs: new[] { this.ModManifest.UniqueID });
+        }
+
+        private void switchIdleMode() {
+            switch (this.Config.IdleMethod) {
+                case "ALL":
+                    this.Config.IdleMethod = "SINGLE";
+                    break;
+                case "SINGLE":
+                    this.Config.IdleMethod = "ALL";
+                    break;
+                default:
+                    this.Config.IdleMethod = "SINGLE";
+                    break;
+            }
+            this.Helper.WriteConfig(this.Config);
+        }
+
+        private void showMessage(string str) {
+            Game1.addHUDMessage(new HUDMessage(str, ""));
         }
 
         private Dictionary<long, bool> _peers;

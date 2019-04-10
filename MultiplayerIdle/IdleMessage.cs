@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultiplayerTime {
+namespace MultiplayerIdle {
     class IdleMessage {
         public bool Idle;
         public IdleMessage(bool isIdle = true) {

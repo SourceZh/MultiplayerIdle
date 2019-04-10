@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultiplayerTime {
+namespace MultiplayerIdle {
     class ModConfig {
         public string IdleMethod { get; set; }
         public int IdleCheckSeconds { get; set; }
