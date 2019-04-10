@@ -21,7 +21,7 @@ namespace MultiplayerIdle {
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
             helper.Events.Display.RenderedHud += this.OnRenderedHud;
             helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
-            helper.Events.Multiplayer.PeerDisconnected += this.OnPeerDisconnected;
+            //helper.Events.Multiplayer.PeerDisconnected += this.OnPeerDisconnected;
             helper.Events.Multiplayer.ModMessageReceived += this.OnModMessageReceived;
         }
 
@@ -126,12 +126,32 @@ namespace MultiplayerIdle {
         }
 
         private bool CheckIdle() {
+            if (Context.IsMainPlayer) {
+                checkOnlineFarmer();
+            }
             switch (this.Config.IdleMethod) {
                 case "ALL":
                     return !_peers.ContainsValue(false) && isIdle;
                 case "SINGLE":
                 default:
                     return _peers.ContainsValue(true) || isIdle;
+            }
+        }
+
+        private void checkOnlineFarmer() {
+            if (Game1.getOnlineFarmers().Count < _peers.Count-1) {
+                foreach (long peerdi in _peers.Keys) {
+                    if(Game1.player.UniqueMultiplayerID != peerdi && this.Helper.Multiplayer.GetConnectedPlayer(peerdi) == null) {
+                        _peers.Remove(peerdi);
+                    }
+                }
+            }
+            if (Game1.getOnlineFarmers().Count > _peers.Count-1) {
+                foreach (Farmer farmer in Game1.getOnlineFarmers()) {
+                    if (Game1.player.UniqueMultiplayerID != farmer.UniqueMultiplayerID && !_peers.ContainsKey(farmer.UniqueMultiplayerID)) {
+                        _peers.Add(farmer.UniqueMultiplayerID, false);
+                    }
+                }
             }
         }
 
@@ -171,7 +191,7 @@ namespace MultiplayerIdle {
         private Dictionary<long, bool> _peers;
         private bool showIdle;
         private bool isIdle;
-        private double lastPressedTime;
+        private int lastPressedTime;
         private ModConfig Config;
     }
 }
